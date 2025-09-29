@@ -16,16 +16,16 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.13"
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          uv install
 
       - name: Run RSS Parser
-        if: github.event.schedule == '0 */4 * * *'
-        run: python parser/rss_parser.py
+        if: ${{ github.event.schedule == '0 */4 * * *' }}
+        run: uv run parser/rss_parser.py
 
       - name: Run Summarization
-        if: github.event.schedule == '0 0 * * *'
-        run: python summarizers/daily_processor.py
+        if: ${{ github.event.schedule == '0 0 * * *' }}
+        run: uv run summarizers/daily_processor.py
