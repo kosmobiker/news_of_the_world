@@ -60,13 +60,6 @@ feeds:
       language: "en"
       enabled: true
 
-    - name: "34mag.net"
-      url: "https://34mag.net/rss"
-      category: "culture"
-      country: "BY"
-      language: "by"
-      enabled: true
-
   sports:
     - name: "Chelsea FC News"
       url: "https://www.eyefootball.com/chelsea.xml"

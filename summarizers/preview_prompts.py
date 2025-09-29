@@ -5,6 +5,9 @@ from sqlalchemy import func
 import json
 from dotenv import load_dotenv
 
+# Use shared prompt builder
+from prompt_builder import build_summarization_prompt, get_default_api_params
+
 
 def get_articles_for_date(db, date):
     """Get articles for a specific date."""
@@ -13,45 +16,21 @@ def get_articles_for_date(db, date):
         Article.content.isnot(None)
     ).all()
 
+def articles_to_dicts(articles):
+    """Convert ORM Article objects to plain dicts for the prompt builder."""
+    result = []
+    for a in articles:
+        result.append({
+            "headline": getattr(a, "headline", None) or getattr(a, "title", None),
+            "website": getattr(a, "website", getattr(a, "source", None)),
+            "content": getattr(a, "content", None) or getattr(a, "summary", None),
+        })
+    return result
+
 def format_prompt(articles):
-    """Format articles into a prompt that would be sent to Grok."""
-    articles_text = "\n\n".join([
-        f"Title: {article.headline}\n"
-        f"Source: {article.website}\n"
-        f"Content: {article.content or article.summary}\n"
-        for article in articles
-    ])
-    
-    prompt = f"""Analyze and summarize the following news articles.
-
-Articles:
-{articles_text}
-
-Provide a structured summary in the following JSON format:
-{{
-    "main_events": [
-        // List of major events or developments, max 5 items
-    ],
-    "key_themes": [
-        // Common themes or trends across articles, max 3 items
-    ],
-    "detailed_summary": "A comprehensive paragraph summarizing the key points",
-    "impacted_regions": [
-        // List of affected countries/regions mentioned
-    ],
-    "timeline": {{
-        // Optional timeline of events if relevant
-    }}
-}}
-
-Ensure the response is valid JSON and follows these guidelines:
-- main_events: Key events in order of importance (max 5)
-- key_themes: Recurring themes or patterns (max 3)
-- detailed_summary: One paragraph overview
-- impacted_regions: Countries/regions affected
-- timeline: Optional chronological events"""
-
-    return prompt
+    """Format articles into a prompt using the shared prompt builder."""
+    article_dicts = articles_to_dicts(articles)
+    return build_summarization_prompt(article_dicts)
 
 def print_prompt_preview(date=None):
     """Print a preview of the prompt that would be sent to Grok."""
@@ -73,16 +52,12 @@ def print_prompt_preview(date=None):
         print(prompt)
         print("\n")
         
-        # Print example API parameters
-        api_params = {
-            "model": "grok-4-fast",
-            "max_tokens": 2048,
-            "temperature": 0.3,
-            "response_format": { "type": "json_object" }
-        }
+        # Print example API parameters (from shared defaults)
+        api_params = get_default_api_params()
+        # add response_format for preview
+        api_params["response_format"] = { "type": "json_object" }
         print("\nAPI Parameters:")
         print(json.dumps(api_params, indent=2))
-        
     finally:
         db.close()
 

@@ -9,21 +9,13 @@ from .base import NewsSummarizer
 from sqlalchemy.orm import Session
 from models.models import GrokInteraction
 import logging
-from pydantic import BaseModel, Field
+from .prompt_builder import SummarySchema, build_summarization_prompt, get_default_api_params
 
 load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-class SummarySchema(BaseModel):
-    text_summary: str = Field(description="A concise one-sentence summary of the key points")
-    detailed_summary: str = Field(description="A comprehensive multi-paragraph analysis")
-    main_events: Dict[str, str] = Field(description="Key events in order of importance (max 5)")
-    key_themes: Dict[str, str] = Field(description="Recurring themes or patterns (max 3)")
-    impacted_regions: Dict[str, str] = Field(description="Countries/regions affected")
-    timeline: Dict[str, str] = Field(description="Chronological events")
 
 class GrokSummarizer(NewsSummarizer):
     """Grok-based implementation of news summarization."""
@@ -44,33 +36,14 @@ class GrokSummarizer(NewsSummarizer):
         """
         Send articles to Grok API for summarization using structured reasoning approach.
         """
-        articles_text = "\n\n".join([
-            f"Title: {article['headline']}\n"
-            f"Source: {article['website']}\n"
-            f"Content: {article.get('content', article.get('summary', 'No content'))}\n"
-            for article in articles
-        ])
-
-        prompt = f"""You are a news analyst tasked with summarizing multiple news articles. 
-Think through this step by step:
-
-1. First, identify the main events from each article
-2. Look for common themes or patterns across articles
-3. Note which regions or countries are mentioned
-4. Create a chronological timeline if relevant
-5. Write both a short and detailed summary
-
-Articles to analyze:
-{articles_text}
-
-Provide your analysis in this exact JSON format:
-{SummarySchema.schema_json(indent=2)}"""
+        # Use shared prompt builder
+        prompt = build_summarization_prompt(articles)
 
         try:
-            chat = self.client.chat.create(model="grok-4")
+            api_params = get_default_api_params()
+            chat = self.client.chat.create(**api_params)
             chat.append(system("You are a news analyst expert at structured summarization. Be concise and focus on key points."))
             chat.append(user(prompt))
-
             response, parsed_summary = chat.parse(SummarySchema)
             return parsed_summary.dict()
         except Exception as e:
