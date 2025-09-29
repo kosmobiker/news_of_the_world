@@ -43,3 +43,11 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
         run: uv run summarizers/daily_processor.py
+
+      - name: Send Daily News
+        if: ${{ github.event.schedule == '0 0 * * *' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TG_API_KEY: ${{ secrets.TG_API_KEY }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: uv run tg_bot/bot.py
