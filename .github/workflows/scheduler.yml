@@ -1,0 +1,31 @@
+name: Scheduled Tasks
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"  # Every 4 hours
+    - cron: "0 0 * * *"    # Once per day at midnight
+
+jobs:
+  run-tasks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run RSS Parser
+        if: github.event.schedule == '0 */4 * * *'
+        run: python parser/rss_parser.py
+
+      - name: Run Summarization
+        if: github.event.schedule == '0 0 * * *'
+        run: python summarizers/daily_processor.py

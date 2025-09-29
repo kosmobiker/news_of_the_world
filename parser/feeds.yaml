@@ -1,0 +1,92 @@
+# RSS Feeds Configuration
+feeds:
+  news:
+    - name: "BBC News"
+      url: "https://feeds.bbci.co.uk/news/rss.xml"
+      category: "news"
+      country: "UK"
+      language: "en"
+      enabled: true
+      
+    - name: "CNN Top Stories"
+      url: "http://rss.cnn.com/rss/edition.rss"
+      category: "news"
+      country: "US"
+      language: "en"
+      enabled: true
+      
+    - name: "Meduza"
+      url: "https://meduza.io/rss2/all"
+      category: "news"
+      country: "RU"
+      language: "ru"
+      enabled: true
+      
+    - name: "CityDog"
+      url: "https://citydog.io/rss/"
+      category: "news"
+      country: "BY"
+      language: "ru"
+      enabled: true
+
+    - name: "zerkalo.io"
+      url: "https://news.zerkalo.io/rss/index.rss"
+      category: "news"
+      country: "BY"
+      language: "ru"
+      enabled: true
+
+  business:
+    - name: "Financial Times"
+      url: "https://www.ft.com/rss/home"
+      category: "business"
+      country: "UK"
+      language: "en"
+      enabled: true
+
+  technology:
+    - name: "TechCrunch"
+      url: "https://techcrunch.com/feed/"
+      category: "technology"
+      country: "US"
+      language: "en"
+      enabled: true
+
+  entertainment:
+    - name: "Pitchfork Album Reviews"
+      url: "https://pitchfork.com/feed/feed-album-reviews/rss"
+      category: "music"
+      country: "US"
+      language: "en"
+      enabled: true
+
+    - name: "34mag.net"
+      url: "https://34mag.net/rss"
+      category: "culture"
+      country: "BY"
+      language: "by"
+      enabled: true
+
+  sports:
+    - name: "Chelsea FC News"
+      url: "https://www.eyefootball.com/chelsea.xml"
+      category: "sports"
+      country: "UK"
+      language: "en"
+      enabled: true
+
+  travel:
+    - name: "34travel.me"
+      url: "https://34travel.me/rss"
+      category: "travel"
+      country: "BY"
+      language: "ru"
+      enabled: true
+
+# Parser settings
+settings:
+  delay_between_feeds: 1.0
+  max_articles_per_feed: 100
+  timeout: 30
+  retry_attempts: 3
+  user_agent: "RSS Parser Bot 1.0"
