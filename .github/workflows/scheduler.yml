@@ -24,8 +24,14 @@ jobs:
 
       - name: Run RSS Parser
         if: ${{ github.event.schedule == '0 */4 * * *' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
         run: uv run parser/rss_parser.py
 
       - name: Run Summarization
         if: ${{ github.event.schedule == '0 0 * * *' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
         run: uv run summarizers/daily_processor.py
