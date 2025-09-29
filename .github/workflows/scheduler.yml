@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: "0 */4 * * *"  # Every 4 hours
     - cron: "0 0 * * *"    # Once per day at midnight
+  workflow_dispatch:       # Manual trigger
 
 jobs:
   run-tasks:
