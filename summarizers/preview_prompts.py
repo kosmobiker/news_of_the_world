@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 from db.database import SessionLocal, Article
 from sqlalchemy import func
 import json
+from dotenv import load_dotenv
+
 
 def get_articles_for_date(db, date):
     """Get articles for a specific date."""
@@ -66,9 +68,10 @@ def print_prompt_preview(date=None):
         
         print(f"\nFound {len(articles)} articles for {date.date()}")
         print("\nPrompt that would be sent to Grok:")
-        print("=" * 80)
-        print(format_prompt(articles))
-        print("=" * 80)
+        print("\n")
+        prompt = format_prompt(articles)
+        print(prompt)
+        print("\n")
         
         # Print example API parameters
         api_params = {
@@ -84,6 +87,8 @@ def print_prompt_preview(date=None):
         db.close()
 
 if __name__ == "__main__":
+    load_dotenv()
+
     # Preview prompt for today
     print("Today's prompt:")
     print_prompt_preview()

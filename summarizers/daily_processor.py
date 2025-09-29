@@ -57,44 +57,11 @@ def process_daily_summary(db: Session, date: datetime = None) -> DailySummary:
     summarizer = GrokSummarizer(db)
     summary_data = summarizer.summarize_articles(article_dicts)
 
-    # Create daily summary record
-    daily_summary = DailySummary(
-        date=start_date,
-        text_summary=summary_data.get("text_summary", ""),
-        detailed_summary=summary_data.get("detailed_summary", ""),
-        main_events=summary_data.get("main_events", {}),
-        key_themes=summary_data.get("key_themes", {}),
-        impacted_regions=summary_data.get("impacted_regions", {}),
-        timeline=summary_data.get("timeline", {}),
-        articles_count=len(articles),
-        generated_at=datetime.utcnow(),
-        model_name=summarizer.model_name,
-        raw_json=summary_data,
-        category="news",  # Default category
-        country="global"  # Default country
-    )
-
-    # Check if a summary already exists for the same date, category, and country
-    existing_summary = (
-        db.query(DailySummary)
-        .filter(DailySummary.date == start_date)
-        .filter(DailySummary.category == "news")  # Default category
-        .filter(DailySummary.country == "global")  # Default country
-        .first()
-    )
-
-    if existing_summary:
-        logger.info(f"Summary for {start_date.date()} already exists")
-        return existing_summary
-
-    # Ensure no duplicate insertion
-    if db.query(DailySummary).filter_by(date=start_date, category="news", country="global").first():
-        logger.warning("Duplicate summary detected. Skipping insertion.")
-        return None
-
-    db.add(daily_summary)
-    db.commit()
-    db.refresh(daily_summary)
-
-    logger.info(f"Created summary for {start_date.date()} with {len(articles)} articles")
-    return daily_summary
+    # Return the summary data instead of saving it to the database
+    logger.info(f"Generated summary for {start_date.date()} with {len(articles)} articles")
+    return {
+        "date": start_date,
+        "summary_data": summary_data,
+        "articles_count": len(articles),
+        "model_name": summarizer.model_name
+    }
