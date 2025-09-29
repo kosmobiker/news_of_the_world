@@ -4,13 +4,9 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-
-[tool.setuptools]
-packages = ["db", "models", "parser", "summarizers"]
 dependencies = [
     "alembic>=1.16.5",
     "feedparser>=6.0.12",
-    "jupyterlab>=4.4.9",
     "langdetect>=1.0.9",
     "psycopg2-binary>=2.9.10",
     "psycopg[binary]>=3.2.10",
@@ -21,3 +17,7 @@ dependencies = [
     "sqlalchemy>=2.0.43",
     "xai-sdk>=1.2.0",
 ]
+
+[tool.setuptools]
+packages = ["db", "models", "parser", "summarizers"]
+
