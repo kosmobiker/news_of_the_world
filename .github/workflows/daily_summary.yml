@@ -1,23 +1,22 @@
-name: Scheduled Tasks
+name: Daily Summary
 
 on:
   schedule:
-    - cron: "0 */4 * * *"  # Every 4 hours
-    - cron: "0 0 * * *"    # Once per day at midnight
-  workflow_dispatch:       # Manual trigger
+    - cron: "0 6 * * *"  # Daily at 06:00 UTC
+  workflow_dispatch:
 
 jobs:
-  run-tasks:
+  summarize-and-send:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.13"
+          python-version: '3.13'
 
       - name: Install UV
         run: |
@@ -30,22 +29,13 @@ jobs:
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
-      - name: Run RSS Parser
-        if: ${{ github.event.schedule == '0 */4 * * *' }}
+      - name: Run Summarization (previous day)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-        run: uv run parser/rss_parser.py
-
-      - name: Run Summarization
-        if: ${{ github.event.schedule == '0 0 * * *' }}
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-        run: uv run summarizers/daily_processor.py
+        run: uv run summarizers/cli.py
 
       - name: Send Daily News
-        if: ${{ github.event.schedule == '0 0 * * *' }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TG_API_KEY: ${{ secrets.TG_API_KEY }}

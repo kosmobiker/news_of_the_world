@@ -12,15 +12,32 @@ logger = logging.getLogger(__name__)
 
 def fetch_articles_for_date(db: Session, start_date: datetime, end_date: datetime):
     """
-    Fetch articles from the database within the specified date range.
+    Fetch articles from the database within the specified date range using parsed_at (when articles were parsed),
+    not published_at.
     """
-    return (
+    # First attempt: use parsed_at (when the parser ingested the article)
+    articles = (
+        db.query(Article)
+        .filter(Article.parsed_at >= start_date)
+        .filter(Article.parsed_at < end_date)
+        .order_by(Article.parsed_at.desc())
+        .all()
+    )
+
+    if articles:
+        return articles
+
+    # Fallback: if nothing found by parsed_at, try published_at (some sources may set published_at differently)
+    logger.info(f"No articles found for {start_date.date()} using parsed_at; falling back to published_at")
+    articles = (
         db.query(Article)
         .filter(Article.published_at >= start_date)
         .filter(Article.published_at < end_date)
         .order_by(Article.published_at.desc())
         .all()
     )
+
+    return articles
 
 def process_daily_summary(db: Session, date: datetime = None) -> DailySummary:
     """

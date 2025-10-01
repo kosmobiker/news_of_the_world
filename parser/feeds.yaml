@@ -22,13 +22,6 @@ feeds:
       language: "ru"
       enabled: true
       
-    - name: "CityDog"
-      url: "https://citydog.io/rss/"
-      category: "news"
-      country: "BY"
-      language: "ru"
-      enabled: true
-
     - name: "zerkalo.io"
       url: "https://news.zerkalo.io/rss/index.rss"
       category: "news"
@@ -36,11 +29,25 @@ feeds:
       language: "ru"
       enabled: true
 
+    - name: "Deutsche Welle"
+      url: "https://rss.dw.com/rdf/rss-en-all"
+      category: "news"
+      country: "DE"
+      language: "de"
+      enabled: true
+
   business:
     - name: "Financial Times"
       url: "https://www.ft.com/rss/home"
       category: "business"
       country: "UK"
+      language: "en"
+      enabled: true
+
+    - name: "Bloomberg"
+      url: "https://feeds.bloomberg.com/economics/news.rss"
+      category: "business"
+      country: "US"
       language: "en"
       enabled: true
 
@@ -68,13 +75,6 @@ feeds:
       language: "en"
       enabled: true
 
-  travel:
-    - name: "34travel.me"
-      url: "https://34travel.me/rss"
-      category: "travel"
-      country: "BY"
-      language: "ru"
-      enabled: true
 
 # Parser settings
 settings:
