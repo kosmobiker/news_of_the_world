@@ -14,10 +14,60 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "pyyaml>=6.0.3",
     "requests>=2.32.5",
+    "ruff>=0.13.3",
     "sqlalchemy>=2.0.43",
     "xai-sdk>=1.2.0",
 ]
 
 [tool.setuptools]
 packages = ["db", "models", "parser", "summarizers"]
+
+[tool.ruff]
+# Global settings
+line-length = 100
+target-version = "py311"
+
+# Enable auto-fixing when running `ruff check --fix`
+fix = true
+
+# File include/exclude
+include = ["*.py", "*.pyi", "**/pyproject.toml"]
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "build",
+    "dist",
+    "__pycache__",
+]
+
+[tool.ruff.lint]
+# Balanced rule selection
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # import sorting
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+]
+
+# Ignore rules that are too strict
+ignore = [
+    "E501",   # line length (let formatter handle it)
+    "B008",   # no function calls in defaults
+    "SIM105", # suggest contextlib.suppress
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # allow unused imports in __init__.py
+
+[tool.ruff.format]
+# Optional: enable Ruff's built-in formatter (replaces Black if you want)
+quote-style = "double"        # or "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
 

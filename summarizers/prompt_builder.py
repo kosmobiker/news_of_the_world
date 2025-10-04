@@ -1,6 +1,8 @@
 """Shared prompt building functionality for news summarization."""
+
 from typing import List, Dict, Any
 from pydantic import BaseModel, Field
+
 
 class SummarySchema(BaseModel):
     text_summary: str = Field(description="A concise one-sentence summary of the key points")
@@ -10,19 +12,23 @@ class SummarySchema(BaseModel):
     impacted_regions: Dict[str, str] = Field(description="Countries/regions affected")
     timeline: Dict[str, str] = Field(description="Chronological events")
 
+
 def format_articles_text(articles: List[Dict[str, Any]]) -> str:
     """Format a list of articles into a standardized text format."""
-    return "\n\n".join([
-        f"Title: {article.get('headline', article.get('title', 'No title'))}\n"
-        f"Source: {article.get('website', article.get('source', 'Unknown'))}\n"
-        f"Content: {article.get('content', article.get('summary', 'No content'))}\n"
-        for article in articles
-    ])
+    return "\n\n".join(
+        [
+            f"Title: {article.get('headline', article.get('title', 'No title'))}\n"
+            f"Source: {article.get('website', article.get('source', 'Unknown'))}\n"
+            f"Content: {article.get('content', article.get('summary', 'No content'))}\n"
+            for article in articles
+        ]
+    )
+
 
 def build_summarization_prompt(articles: List[Dict[str, Any]]) -> str:
     """Build a standardized prompt for news summarization."""
     articles_text = format_articles_text(articles)
-    
+
     prompt = f"""You are a news analyst tasked with summarizing multiple news articles. 
 Think through this step by step:
 
@@ -40,10 +46,7 @@ Provide your analysis in this exact JSON format:
 
     return prompt
 
+
 def get_default_api_params() -> Dict[str, Any]:
     """Get the default API parameters for Grok."""
-    return {
-        "model": "grok-4-fast",
-        "temperature": 0.3,
-        "max_tokens": 4096
-    }
+    return {"model": "grok-4-fast", "temperature": 0.3, "max_tokens": 4096}

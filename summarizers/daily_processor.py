@@ -1,4 +1,5 @@
 """Process daily summaries using the Grok API."""
+
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -9,6 +10,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 def fetch_articles_for_date(db: Session, start_date: datetime, end_date: datetime):
     """
@@ -28,7 +30,9 @@ def fetch_articles_for_date(db: Session, start_date: datetime, end_date: datetim
         return articles
 
     # Fallback: if nothing found by parsed_at, try published_at (some sources may set published_at differently)
-    logger.info(f"No articles found for {start_date.date()} using parsed_at; falling back to published_at")
+    logger.info(
+        f"No articles found for {start_date.date()} using parsed_at; falling back to published_at"
+    )
     articles = (
         db.query(Article)
         .filter(Article.published_at >= start_date)
@@ -38,6 +42,7 @@ def fetch_articles_for_date(db: Session, start_date: datetime, end_date: datetim
     )
 
     return articles
+
 
 def process_daily_summary(db: Session, date: datetime = None) -> DailySummary:
     """
@@ -80,5 +85,5 @@ def process_daily_summary(db: Session, date: datetime = None) -> DailySummary:
         "date": start_date,
         "summary_data": summary_data,
         "articles_count": len(articles),
-        "model_name": summarizer.model_name
+        "model_name": summarizer.model_name,
     }
