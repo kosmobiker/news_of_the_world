@@ -36,6 +36,20 @@ feeds:
       language: "de"
       enabled: true
 
+    - name: "Le Monde"
+      url: "https://www.lemonde.fr/rss/une.xml"
+      category: "news"
+      country: "FR"
+      language: "fr"
+      enabled: true
+    
+    - name: "Onet.pl"
+      url: "https://wiadomosci.onet.pl/.feed"
+      category: "news"
+      country: "PL"
+      language: "pl"
+      enabled: true
+
   business:
     - name: "Financial Times"
       url: "https://www.ft.com/rss/home"
@@ -59,6 +73,13 @@ feeds:
       language: "en"
       enabled: true
 
+    - name: "Wired"
+      url: "https://www.wired.com/feed/category/science/latest/rss"
+      category: "technology"
+      country: "US"
+      language: "en"
+      enabled: true
+
   entertainment:
     - name: "Pitchfork Album Reviews"
       url: "https://pitchfork.com/feed/feed-album-reviews/rss"
@@ -75,6 +96,12 @@ feeds:
       language: "en"
       enabled: true
 
+    - name: "ESPN Soccer"
+      url: "https://www.espn.com/espn/rss/soccer/news"
+      category: "sports"
+      country: "US"
+      language: "en"
+      enabled: true
 
 # Parser settings
 settings:
