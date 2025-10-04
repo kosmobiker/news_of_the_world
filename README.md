@@ -22,11 +22,6 @@
    uv sync
    ```
 3. Set up environment variables in a `.env` file:
-   ```env
-   DATABASE_URL=<your_database_url>
-   XAI_API_KEY=<your_api_key>
-   PYTHONPATH=.
-   ```
 
 ## Usage
 - Run the RSS parser:
@@ -41,4 +36,4 @@
 ## GitHub Actions
 This repository includes a GitHub Actions workflow to automate tasks:
 - **RSS Parsing**: Runs every 4 hours.
-- **Summarization**: Runs daily at midnight.
+- **Summarization**: Runs daily at 6 am
