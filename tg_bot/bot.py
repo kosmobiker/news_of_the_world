@@ -192,8 +192,10 @@ def format_summary(summary):
     for key, theme in summary["key_themes"].items():
         formatted += f"  - {theme}\n"
     formatted += "\n🌎 Impacted Regions:\n"
-    for key, region in summary.get("impacted_regions", {}).items():
-        formatted += f"  - {region}\n"
+    impacted = summary.get("impacted_regions") or {}
+    # Ensure we print region name: details
+    for region_name, details in impacted.items():
+        formatted += f"  - {region_name}: {details}\n"
     # Detailed summary (raw)
     detailed = summary.get("detailed_summary") or ""
     formatted += f"\n📖 Detailed Summary:\n{detailed}\n"
