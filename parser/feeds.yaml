@@ -43,13 +43,6 @@ feeds:
       language: "fr"
       enabled: true
     
-    - name: "Onet.pl"
-      url: "https://wiadomosci.onet.pl/.feed"
-      category: "news"
-      country: "PL"
-      language: "pl"
-      enabled: true
-
     - name: "South China Morning Post"
       url: "https://www.scmp.com/rss/91/feed"
       category: "news"
@@ -90,21 +83,6 @@ feeds:
     - name: "MIT Technology Review"
       url: "https://www.technologyreview.com/feed/"
       category: "technology"
-      country: "US"
-      language: "en"
-      enabled: true
-
-  sports:
-    - name: "Chelsea FC News"
-      url: "https://www.eyefootball.com/chelsea.xml"
-      category: "sports"
-      country: "UK"
-      language: "en"
-      enabled: true
-
-    - name: "ESPN Soccer"
-      url: "https://www.espn.com/espn/rss/soccer/news"
-      category: "sports"
       country: "US"
       language: "en"
       enabled: true
