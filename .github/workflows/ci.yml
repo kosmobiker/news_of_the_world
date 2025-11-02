@@ -3,8 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - main
-      - 'feature/**'
+  - main
   pull_request:
     branches:
       - main
@@ -38,6 +37,9 @@ jobs:
         run: make fmt
 
       - name: Run tests with coverage
+        env:
+          XAI_API_KEY: "test_key"
+          DATABASE_URL: "sqlite:///:memory:"
         run: |
           uv run python -m coverage run -m unittest discover -s tests
           python -m coverage xml -o coverage.xml || true
