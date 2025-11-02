@@ -73,13 +73,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(
-        "idx_daily_summaries_impacted_regions",
-        "daily_summaries",
-        ["impacted_regions"],
-        unique=False,
-        postgresql_using="gin",
-    )
-    op.create_index(
         "idx_daily_summaries_key_themes",
         "daily_summaries",
         ["key_themes"],
@@ -135,9 +128,6 @@ def downgrade() -> None:
     )
     op.drop_index(
         "idx_daily_summaries_key_themes", table_name="daily_summaries", postgresql_using="gin"
-    )
-    op.drop_index(
-        "idx_daily_summaries_impacted_regions", table_name="daily_summaries", postgresql_using="gin"
     )
     op.drop_table("daily_summaries")
     op.drop_index(op.f("ix_articles_website"), table_name="articles")

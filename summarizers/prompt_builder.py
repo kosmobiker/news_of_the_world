@@ -2,6 +2,7 @@
 
 from typing import List, Dict, Any
 from pydantic import BaseModel, Field
+import json
 
 
 class SummarySchema(BaseModel):
@@ -29,20 +30,37 @@ def build_summarization_prompt(articles: List[Dict[str, Any]]) -> str:
     """Build a standardized prompt for news summarization."""
     articles_text = format_articles_text(articles)
 
-    prompt = f"""You are a news analyst tasked with summarizing multiple news articles. 
-Think through this step by step:
+    # More explicit and constrained prompt to improve LLM output quality.
+    prompt = f"""
+You are a professional, neutral, and concise news analyst. Your job is to read the provided articles and produce a structured JSON report describing the reportage's facts, interpretation, and key metadata.
 
-1. First, identify the main events from each article
-2. Look for common themes or patterns across articles
-3. Note which regions or countries are mentioned
-4. Create a chronological timeline if relevant
-5. Write both a short and detailed summary
+Rules and constraints (MUST follow exactly):
+1) Output: Return ONLY a single JSON object and nothing else. Do not include backticks, explanation, preamble, or trailing text.
+2) Schema: The JSON must conform to the following Pydantic schema exactly (field names and types). Use empty strings or empty objects where information is missing.
+3) Length and style:
+   - `text_summary`: one sentence, maximum 30 words, objective and non-opinionated.
+   - `detailed_summary`: 2–5 paragraphs. Each paragraph should be 2–5 sentences long. Use neutral, factual language and cite article titles in parentheses when summarizing where appropriate.
+   - `main_events`: up to 5 key events, ordered by importance. Each key is a short label (10 words max) and the value is a concise description (1–3 sentences).
+   - `key_themes`: up to 3 themes. Each key is a short phrase and the value is a short explanation linking evidence from the articles.
+   - `impacted_regions`: list countries/regions mentioned, with one-line notes about the nature of impact.
+   - `timeline`: chronological map with short date or relative time keys and 1–2 sentence descriptions.
 
-Articles to analyze:
+Instructions for analysis (stepwise):
+1. Quickly extract the factual claims (who, what, when, where) from each article.
+2. Normalize named entities (countries, organizations) to a canonical short form.
+3. Detect and collapse near-duplicate events across articles into a single `main_events` entry and note sources in the description.
+4. Identify recurring themes across articles (political, economic, humanitarian, security, legal, environmental).
+5. Construct a simple chronological `timeline` using explicit dates when present; otherwise use relative markers (e.g., "Day 1", "Earlier this week").
+6. Produce `text_summary` then `detailed_summary` using only the facts and aggregated evidence from the articles.
+
+If a field cannot be populated, return an empty string for text fields or an empty object/dict for mapping fields.
+
+Articles to analyze (do not modify article text):
 {articles_text}
 
-Provide your analysis in this exact JSON format:
-{SummarySchema.schema_json(indent=2)}"""
+Return JSON conforming exactly to this schema:
+{json.dumps(SummarySchema.model_json_schema(), indent=2)}
+"""
 
     return prompt
 
