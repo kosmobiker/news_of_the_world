@@ -50,6 +50,14 @@ feeds:
       language: "en"
       enabled: true
 
+    - name: "The Guardian"
+      url: "https://www.theguardian.com/world/rss"
+      category: "news"
+      country: "UK"
+      language: "en"
+      enabled: true
+
+
   business:
     - name: "Financial Times"
       url: "https://www.ft.com/rss/home"
@@ -65,9 +73,28 @@ feeds:
       language: "en"
       enabled: true
 
+    - name: "The Wall Street Journal"
+      url: "https://feeds.content.dowjones.io/public/rss/RSSMarketsMain"
+      category: "business"
+      language: "en"
+      country: "US"
+
+    - name: "Coindesk"
+      url: "https://www.coindesk.com/arc/outboundfeeds/rss"
+      category: "business"
+      language: "en"
+      country: "US"
+
   technology:
     - name: "TechCrunch"
       url: "https://techcrunch.com/feed/"
+      category: "technology"
+      country: "US"
+      language: "en"
+      enabled: true
+
+    - name: "TechCrunch Startups"
+      url: "https://techcrunch.com/category/startups/feed/"
       category: "technology"
       country: "US"
       language: "en"
@@ -86,6 +113,22 @@ feeds:
       country: "US"
       language: "en"
       enabled: true
+
+  politics:
+    - name: "Politico"
+      url: "https://www.politico.com/rss/politics08.xml"
+      category: "politics"
+      country: "US"
+      language: "en"
+      enabled: true
+
+    - name: "LSE"
+      url: "https://blogs.lse.ac.uk/europpblog/feed/"
+      category: "politics"
+      country: "UK"
+      language: "en"
+      enabled: true
+
 
 # Parser settings
 settings:
