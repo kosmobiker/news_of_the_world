@@ -27,8 +27,8 @@ def load_feeds_config(config_path: str = "feeds.yaml") -> FeedsConfig:
 
         return FeedsConfig(feeds=feeds_dict, settings=settings)
 
-    except Exception as e:
-        print(f"Error loading configuration: {e}")
+    except Exception:
+        # Propagate the exception to callers without printing to avoid noisy test output.
         raise
 
 

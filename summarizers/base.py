@@ -9,7 +9,7 @@ class NewsSummarizer(ABC):
     """Abstract base class for news summarizers."""
 
     @abstractmethod
-    async def summarize_articles(self, articles: List[Dict[str, Any]]) -> str:
+    def summarize_articles(self, articles: List[Dict[str, Any]]) -> str:
         """
         Generate a summary for a list of articles.
 

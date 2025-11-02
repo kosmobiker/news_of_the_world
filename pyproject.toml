@@ -15,6 +15,7 @@ dependencies = [
     "pyyaml>=6.0.3",
     "requests>=2.32.5",
     "ruff>=0.13.3",
+    "coverage>=6.5.0",
     "sqlalchemy>=2.0.43",
     "xai-sdk>=1.2.0",
 ]

@@ -1,12 +1,11 @@
 # Simple Makefile for common dev tasks
 
-.PHONY: init fmt
-
-init:
-	# Set PYTHONPATH for current shell; on Windows (PowerShell) run:
-	#   $env:PYTHONPATH = "."
-	@echo "On Windows PowerShell run: $env:PYTHONPATH = '.'"
-	@echo "Or add to your profile: $env:PYTHONPATH = '.'"
+.PHONY: fmt test
 
 fmt:
 	ruff format .
+
+test:
+	@echo "Running tests..."
+	uv run python -m coverage run -m unittest discover -s tests
+	uv run python -m coverage report -m
