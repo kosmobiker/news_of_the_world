@@ -12,16 +12,18 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def fetch_articles_for_date(db: Session, start_date: datetime, end_date: datetime):
+def fetch_articles_for_date(db: Session, target_date: datetime):
     """
-    Fetch articles from the database within the specified date range using parsed_at (when articles were parsed),
-    not published_at.
+    Fetch articles from the database for the calendar day of `target_date` using the date
+    portion of `parsed_at`. This avoids hour-level timezone/window mismatches when the
+    summarization job runs at an arbitrary time (e.g. 04:30 next day).
+
+    If no articles are found by parsed_at date, fall back to published_at date.
     """
-    # First attempt: use parsed_at (when the parser ingested the article)
+    # Use the DB's date extraction to match all rows whose parsed_at date equals target_date.date()
     articles = (
         db.query(Article)
-        .filter(Article.parsed_at >= start_date)
-        .filter(Article.parsed_at < end_date)
+        .filter(func.date(Article.parsed_at) == target_date.date())
         .order_by(Article.parsed_at.desc())
         .all()
     )
@@ -29,14 +31,13 @@ def fetch_articles_for_date(db: Session, start_date: datetime, end_date: datetim
     if articles:
         return articles
 
-    # Fallback: if nothing found by parsed_at, try published_at (some sources may set published_at differently)
     logger.info(
-        f"No articles found for {start_date.date()} using parsed_at; falling back to published_at"
+        f"No articles found for {target_date.date()} using parsed_at date; falling back to published_at date"
     )
+
     articles = (
         db.query(Article)
-        .filter(Article.published_at >= start_date)
-        .filter(Article.published_at < end_date)
+        .filter(func.date(Article.published_at) == target_date.date())
         .order_by(Article.published_at.desc())
         .all()
     )
@@ -49,21 +50,22 @@ def process_daily_summary(db: Session, date: datetime = None) -> DailySummary:
     Create a summary for all articles from a specific date.
     If date is not provided, process for today.
     """
+    # Default behavior: process yesterday's calendar day. This ensures that
+    # a run occurring in the early hours of the next day (e.g. 2025-11-04 04:30)
+    # will summarize articles from 2025-11-03 (00:00–23:59) as requested.
     if date is None:
-        date = datetime.utcnow()
+        date = datetime.utcnow() - timedelta(days=1)
 
-    # Get the date range for the entire day
-    start_date = date.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_date = start_date + timedelta(days=1)
+    target_date = date if isinstance(date, datetime) else datetime.utcnow() - timedelta(days=1)
 
-    # Fetch articles for the date
-    articles = fetch_articles_for_date(db, start_date, end_date)
+    # Fetch articles for the calendar date
+    articles = fetch_articles_for_date(db, target_date)
 
     if not articles:
-        logger.warning(f"No articles found for {start_date.date()}")
+        logger.warning(f"No articles found for {target_date.date()}")
         return None
 
-    logger.info(f"Processing {len(articles)} articles for {start_date.date()}")
+    logger.info(f"Processing {len(articles)} articles for {target_date.date()}")
 
     # Convert articles to format expected by summarizer
     article_dicts = [
@@ -80,9 +82,13 @@ def process_daily_summary(db: Session, date: datetime = None) -> DailySummary:
     summary_data = summarizer.summarize_articles(article_dicts)
 
     # Return the summary data instead of saving it to the database
-    logger.info(f"Generated summary for {start_date.date()} with {len(articles)} articles")
+    logger.info(f"Generated summary for {target_date.date()} with {len(articles)} articles")
+    # Store the date as midnight UTC for the day summarized to keep `daily_summaries.date`
+    # consistent. Use target_date.replace(...) to zero-out time component.
+    stored_date = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
+
     return {
-        "date": start_date,
+        "date": stored_date,
         "summary_data": summary_data,
         "articles_count": len(articles),
         "model_name": summarizer.model_name,
