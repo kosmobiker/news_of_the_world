@@ -33,7 +33,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-        run: uv run summarizers/cli.py
+        run: uv run summarizers/cli.py --categories business technology
 
       - name: Send Daily News
         env:

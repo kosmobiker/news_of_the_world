@@ -50,14 +50,6 @@ feeds:
       language: "en"
       enabled: true
 
-    - name: "The Guardian"
-      url: "https://www.theguardian.com/world/rss"
-      category: "news"
-      country: "UK"
-      language: "en"
-      enabled: true
-
-
   business:
     - name: "Financial Times"
       url: "https://www.ft.com/rss/home"
@@ -109,6 +101,13 @@ feeds:
 
     - name: "MIT Technology Review"
       url: "https://www.technologyreview.com/feed/"
+      category: "technology"
+      country: "US"
+      language: "en"
+      enabled: true
+
+    - name: "The Verge"
+      url: "https://www.theverge.com/rss/index.xml"
       category: "technology"
       country: "US"
       language: "en"
