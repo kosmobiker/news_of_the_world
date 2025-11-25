@@ -67,4 +67,4 @@ Return JSON conforming exactly to this schema:
 
 def get_default_api_params() -> Dict[str, Any]:
     """Get the default API parameters for Grok."""
-    return {"model": "grok-4-fast", "temperature": 0.3, "max_tokens": 4096}
+    return {"model": "grok-4-1-fast-reasoning", "temperature": 0.3, "max_tokens": 4096}
