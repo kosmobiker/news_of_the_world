@@ -82,12 +82,14 @@ feeds:
     - name: "Reuters Business"
       url: "https://ir.thomsonreuters.com/rss/news-releases.xml?items=15"
       category: "business"
+      language: "en"
       country: "US"
       enabled: true
 
     - name: "Business Insider"
       url: "https://feeds.businessinsider.com/custom/all"
       category: "business"
+      language: "en"
       country: "US"
       enabled: true
 
