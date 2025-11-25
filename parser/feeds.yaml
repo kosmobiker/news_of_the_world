@@ -70,12 +70,26 @@ feeds:
       category: "business"
       language: "en"
       country: "US"
+      enabled: true
 
     - name: "Coindesk"
       url: "https://www.coindesk.com/arc/outboundfeeds/rss"
       category: "business"
       language: "en"
       country: "US"
+      enabled: true
+
+    - name: "Reuters Business"
+      url: "https://ir.thomsonreuters.com/rss/news-releases.xml?items=15"
+      category: "business"
+      country: "US"
+      enabled: true
+
+    - name: "Business Insider"
+      url: "https://feeds.businessinsider.com/custom/all"
+      category: "business"
+      country: "US"
+      enabled: true
 
   technology:
     - name: "TechCrunch"
@@ -106,8 +120,15 @@ feeds:
       language: "en"
       enabled: true
 
-    - name: "The Verge"
-      url: "https://www.theverge.com/rss/index.xml"
+    - name: "Hacker News"
+      url: "https://hnrss.org/newest.jsonfeed"
+      category: "technology"
+      country: "US"
+      language: "en"
+      enabled: true
+
+    - name: "IEEE Spectrum"
+      url: "https://feeds.feedburner.com/IeeeSpectrumFullText"
       category: "technology"
       country: "US"
       language: "en"
