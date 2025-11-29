@@ -69,6 +69,7 @@ class DailySummary(Base):
     detailed_summary = Column(Text)
     impacted_regions = Column(JSONB)
     timeline = Column(JSONB)
+    top_articles = Column(JSONB)
     raw_json = Column(JSONB)
     error_count = Column(Integer)
     last_error = Column(Text)
