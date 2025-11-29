@@ -92,22 +92,8 @@ feeds:
       enabled: true
 
   technology:
-    - name: "TechCrunch"
-      url: "https://techcrunch.com/feed/"
-      category: "technology"
-      country: "US"
-      language: "en"
-      enabled: true
-
     - name: "TechCrunch Startups"
       url: "https://techcrunch.com/category/startups/feed/"
-      category: "technology"
-      country: "US"
-      language: "en"
-      enabled: true
-
-    - name: "Wired"
-      url: "https://www.wired.com/feed/category/science/latest/rss"
       category: "technology"
       country: "US"
       language: "en"
@@ -134,21 +120,48 @@ feeds:
       language: "en"
       enabled: true
 
-  politics:
-    - name: "Politico"
-      url: "https://www.politico.com/rss/politics08.xml"
-      category: "politics"
+  engineering:
+    - name: "Engineering at Meta"
+      url: "https://engineering.fb.com/feed/"
+      category: "engineering"
       country: "US"
       language: "en"
       enabled: true
 
-    - name: "LSE"
-      url: "https://blogs.lse.ac.uk/europpblog/feed/"
-      category: "politics"
-      country: "UK"
+    - name: "Google Research Blog"
+      url: "https://research.google/blog/rss/"
+      category: "engineering"
+      country: "US"
       language: "en"
       enabled: true
 
+    - name: "AWS Architecture Blog"
+      url: "https://aws.amazon.com/blogs/aws/feed/"
+      category: "engineering"
+      country: "US"
+      language: "en"
+      enabled: true
+
+    - name: "Uber Engineering Blog"
+      url: "https://www.uber.com/blog/engineering/rss/"
+      category: "engineering"
+      country: "US"
+      language: "en"
+      enabled: true
+
+    - name: "Dropbox Tech Blog"
+      url: "https://dropbox.tech/feed/"
+      category: "engineering"
+      country: "US"
+      language: "en"
+      enabled: true
+
+    - name: "All Things Distributed"
+      url: "https://www.allthingsdistributed.com/atom.xml"
+      category: "engineering"
+      country: "US"
+      language: "en"
+      enabled: true
 
 # Parser settings
 settings:
