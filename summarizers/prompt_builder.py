@@ -12,7 +12,9 @@ class SummarySchema(BaseModel):
     key_themes: Dict[str, str] = Field(description="Recurring themes or patterns (max 3)")
     impacted_regions: Dict[str, str] = Field(description="Countries/regions affected")
     timeline: Dict[str, str] = Field(description="Chronological events")
-    top_articles: List[Dict[str, str]] = Field(description="Top 10 most relevant articles with title, source, and link")
+    top_articles: List[Dict[str, str]] = Field(
+        description="Top 10 most relevant articles with title, source, and link"
+    )
 
 
 def format_articles_text(articles: List[Dict[str, Any]]) -> str:

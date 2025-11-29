@@ -8,9 +8,9 @@ from models.models import DailySummary  # Import the DailySummary model
 
 # Default time window (in days) for each category
 DEFAULT_TIME_WINDOWS = {
-    "business": 1,      # Daily
-    "technology": 1,    # Daily
-    "engineering": 7,   # Weekly
+    "business": 1,  # Daily
+    "technology": 1,  # Daily
+    "engineering": 7,  # Weekly
 }
 
 
@@ -26,7 +26,9 @@ def save_summary_to_db(db, summary, category):
     )
 
     if existing_summary:
-        print(f"Summary for {summary['date']} in category '{category}' already exists in the database.")
+        print(
+            f"Summary for {summary['date']} in category '{category}' already exists in the database."
+        )
         return False
     else:
         # Insert the new summary into the database
@@ -56,7 +58,9 @@ def save_summary_to_db(db, summary, category):
 
 def main():
     """Process summaries for articles with configurable time windows."""
-    parser = argparse.ArgumentParser(description="Process news summaries by category with configurable time windows")
+    parser = argparse.ArgumentParser(
+        description="Process news summaries by category with configurable time windows"
+    )
     parser.add_argument(
         "--date",
         type=str,
@@ -83,7 +87,9 @@ def main():
     # Validate days argument if provided
     if args.days:
         if len(args.days) != len(args.categories):
-            print(f"Error: Number of --days values ({len(args.days)}) must match number of --categories ({len(args.categories)})")
+            print(
+                f"Error: Number of --days values ({len(args.days)}) must match number of --categories ({len(args.categories)})"
+            )
             return
         time_windows = dict(zip(args.categories, args.days))
     else:
@@ -105,20 +111,20 @@ def main():
 
     try:
         db = SessionLocal()
-        
+
         summaries_created = 0
         for category in args.categories:
             days = time_windows[category]
             window_type = "daily" if days == 1 else f"weekly ({days}d)"
             print(f"\n--- Processing {category.upper()} category ({window_type}) ---")
             summary = process_daily_summary(db, target_date, category=category, days=days)
-            
+
             if summary:
                 if save_summary_to_db(db, summary, category):
                     summaries_created += 1
             else:
                 print(f"No articles found to summarize for {category} category.")
-        
+
         if summaries_created > 0:
             print(f"\n✓ Successfully created {summaries_created} summaries.")
         else:

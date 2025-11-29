@@ -68,11 +68,11 @@ class TestFetchArticlesForDate(unittest.TestCase):
             MagicMock(headline="Article 2"),
             MagicMock(headline="Article 3"),
         ]
-        
+
         # Patch the entire function to test the parameter passing
         with patch("summarizers.daily_processor.fetch_articles_for_date") as mock_fetch:
             mock_fetch.return_value = articles
-            
+
             # When
             result = mock_fetch(self.mock_db, target_date, category=None, days=1)
 
@@ -115,20 +115,20 @@ class TestProcessDailySummary(unittest.TestCase):
         """Test processing daily summary for business category (1 day)."""
         # Given
         target_date = datetime(2025, 11, 28, 12, 0, 0)
-        
+
         # Mock articles
         mock_article1 = MagicMock()
         mock_article1.headline = "Market Report"
         mock_article1.website = "Financial Times"
         mock_article1.content = "Market data..."
         mock_article1.link = "https://ft.com/article1"
-        
+
         mock_article2 = MagicMock()
         mock_article2.headline = "Tech IPO"
         mock_article2.website = "Bloomberg"
         mock_article2.content = "IPO announcement..."
         mock_article2.link = "https://bloomberg.com/article2"
-        
+
         articles = [mock_article1, mock_article2]
         mock_fetch.return_value = articles
 
@@ -144,8 +144,16 @@ class TestProcessDailySummary(unittest.TestCase):
             "impacted_regions": {"US": "Stock market rally"},
             "timeline": {"Nov 28": "Market surge"},
             "top_articles": [
-                {"title": "Market Report", "source": "Financial Times", "link": "https://ft.com/article1"},
-                {"title": "Tech IPO", "source": "Bloomberg", "link": "https://bloomberg.com/article2"},
+                {
+                    "title": "Market Report",
+                    "source": "Financial Times",
+                    "link": "https://ft.com/article1",
+                },
+                {
+                    "title": "Tech IPO",
+                    "source": "Bloomberg",
+                    "link": "https://bloomberg.com/article2",
+                },
             ],
         }
 
@@ -159,7 +167,7 @@ class TestProcessDailySummary(unittest.TestCase):
         self.assertEqual(result["model_name"], "grok")
         self.assertIn("top_articles", result["summary_data"])
         self.assertEqual(len(result["summary_data"]["top_articles"]), 2)
-        
+
         # Verify fetch was called with correct parameters
         mock_fetch.assert_called_once_with(self.mock_db, target_date, category="business", days=1)
 
@@ -169,7 +177,7 @@ class TestProcessDailySummary(unittest.TestCase):
         """Test processing weekly summary for engineering category (7 days)."""
         # Given
         target_date = datetime(2025, 11, 28, 12, 0, 0)
-        
+
         # Mock articles (more articles for weekly)
         articles = []
         for i in range(1, 8):
@@ -179,19 +187,23 @@ class TestProcessDailySummary(unittest.TestCase):
             mock_article.content = f"Content {i}..."
             mock_article.link = f"https://example.com/article{i}"
             articles.append(mock_article)
-        
+
         mock_fetch.return_value = articles
 
         # Mock Grok summarizer
         mock_summarizer = MagicMock()
         mock_grok_class.return_value = mock_summarizer
         mock_summarizer.model_name = "grok"
-        
+
         top_articles = [
-            {"title": f"Engineering Article {i}", "source": f"Source {i}", "link": f"https://example.com/article{i}"}
+            {
+                "title": f"Engineering Article {i}",
+                "source": f"Source {i}",
+                "link": f"https://example.com/article{i}",
+            }
             for i in range(1, 6)
         ]
-        
+
         mock_summarizer.summarize_articles.return_value = {
             "text_summary": "Weekly engineering updates",
             "detailed_summary": "This week in engineering...",
@@ -203,7 +215,9 @@ class TestProcessDailySummary(unittest.TestCase):
         }
 
         # When
-        result = process_daily_summary(self.mock_db, date=target_date, category="engineering", days=7)
+        result = process_daily_summary(
+            self.mock_db, date=target_date, category="engineering", days=7
+        )
 
         # Then
         self.assertIsNotNone(result)
@@ -211,9 +225,11 @@ class TestProcessDailySummary(unittest.TestCase):
         self.assertEqual(result["articles_count"], 7)
         self.assertEqual(result["model_name"], "grok")
         self.assertEqual(len(result["summary_data"]["top_articles"]), 5)
-        
+
         # Verify fetch was called with 7 days
-        mock_fetch.assert_called_once_with(self.mock_db, target_date, category="engineering", days=7)
+        mock_fetch.assert_called_once_with(
+            self.mock_db, target_date, category="engineering", days=7
+        )
 
     @patch("summarizers.daily_processor.fetch_articles_for_date")
     def test_process_summary_no_articles_found(self, mock_fetch):
@@ -223,7 +239,9 @@ class TestProcessDailySummary(unittest.TestCase):
         mock_fetch.return_value = []
 
         # When
-        result = process_daily_summary(self.mock_db, date=target_date, category="technology", days=1)
+        result = process_daily_summary(
+            self.mock_db, date=target_date, category="technology", days=1
+        )
 
         # Then
         self.assertIsNone(result)
@@ -234,13 +252,13 @@ class TestProcessDailySummary(unittest.TestCase):
         """Test processing daily summary for technology category."""
         # Given
         target_date = datetime(2025, 11, 28, 12, 0, 0)
-        
+
         mock_article = MagicMock()
         mock_article.headline = "AI Breakthrough"
         mock_article.website = "TechCrunch"
         mock_article.content = "New AI model released..."
         mock_article.link = "https://techcrunch.com/ai-breakthrough"
-        
+
         mock_fetch.return_value = [mock_article]
 
         mock_summarizer = MagicMock()
@@ -254,18 +272,24 @@ class TestProcessDailySummary(unittest.TestCase):
             "impacted_regions": {"Global": "Tech industry"},
             "timeline": {"Nov 28": "AI release"},
             "top_articles": [
-                {"title": "AI Breakthrough", "source": "TechCrunch", "link": "https://techcrunch.com/ai-breakthrough"}
+                {
+                    "title": "AI Breakthrough",
+                    "source": "TechCrunch",
+                    "link": "https://techcrunch.com/ai-breakthrough",
+                }
             ],
         }
 
         # When
-        result = process_daily_summary(self.mock_db, date=target_date, category="technology", days=1)
+        result = process_daily_summary(
+            self.mock_db, date=target_date, category="technology", days=1
+        )
 
         # Then
         self.assertIsNotNone(result)
         self.assertEqual(result["category"], "technology")
         self.assertEqual(result["articles_count"], 1)
-        
+
         # Verify fetch was called with 1 day for daily
         mock_fetch.assert_called_once_with(self.mock_db, target_date, category="technology", days=1)
 
@@ -279,7 +303,7 @@ class TestProcessDailySummary(unittest.TestCase):
         mock_article.website = "BBC"
         mock_article.content = "News content..."
         mock_article.link = "https://bbc.com/news"
-        
+
         mock_fetch.return_value = [mock_article]
 
         mock_summarizer = MagicMock()
@@ -317,7 +341,7 @@ class TestTimeWindowComparison(unittest.TestCase):
         """Test that weekly summaries typically contain more articles than daily."""
         # Given
         target_date = datetime(2025, 11, 28, 12, 0, 0)
-        
+
         # Daily has fewer articles
         daily_articles = [MagicMock() for _ in range(3)]
         for i, article in enumerate(daily_articles):
@@ -325,7 +349,7 @@ class TestTimeWindowComparison(unittest.TestCase):
             article.website = f"Source {i}"
             article.content = f"Content {i}"
             article.link = f"https://example.com/{i}"
-        
+
         # Weekly has more articles
         weekly_articles = [MagicMock() for _ in range(10)]
         for i, article in enumerate(weekly_articles):
@@ -350,18 +374,12 @@ class TestTimeWindowComparison(unittest.TestCase):
         # When
         mock_fetch.return_value = daily_articles
         daily_result = process_daily_summary(
-            MagicMock(spec=Session), 
-            date=target_date, 
-            category="business", 
-            days=1
+            MagicMock(spec=Session), date=target_date, category="business", days=1
         )
 
         mock_fetch.return_value = weekly_articles
         weekly_result = process_daily_summary(
-            MagicMock(spec=Session), 
-            date=target_date, 
-            category="business", 
-            days=7
+            MagicMock(spec=Session), date=target_date, category="business", days=7
         )
 
         # Then
