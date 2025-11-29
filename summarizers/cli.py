@@ -6,6 +6,13 @@ from db.database import SessionLocal
 from summarizers.daily_processor import process_daily_summary
 from models.models import DailySummary  # Import the DailySummary model
 
+# Default time window (in days) for each category
+DEFAULT_TIME_WINDOWS = {
+    "business": 1,      # Daily
+    "technology": 1,    # Daily
+    "engineering": 7,   # Weekly
+}
+
 
 def save_summary_to_db(db, summary, category):
     """Helper function to save a summary to the database."""
@@ -31,6 +38,7 @@ def save_summary_to_db(db, summary, category):
             key_themes=summary["summary_data"].get("key_themes", {}),
             impacted_regions=summary["summary_data"].get("impacted_regions", {}),
             timeline=summary["summary_data"].get("timeline", {}),
+            top_articles=summary["summary_data"].get("top_articles", []),
             articles_count=summary["articles_count"],
             generated_at=datetime.utcnow(),
             model_name=summary["model_name"],
@@ -47,8 +55,8 @@ def save_summary_to_db(db, summary, category):
 
 
 def main():
-    """Process daily summaries for articles."""
-    parser = argparse.ArgumentParser(description="Process daily news summaries by category")
+    """Process summaries for articles with configurable time windows."""
+    parser = argparse.ArgumentParser(description="Process news summaries by category with configurable time windows")
     parser.add_argument(
         "--date",
         type=str,
@@ -59,11 +67,28 @@ def main():
         "--categories",
         type=str,
         nargs="+",
-        help="Categories to process (e.g., business technology). If not specified, processes all available categories.",
+        help="Categories to process (e.g., business technology engineering). If not specified, processes: business (daily), technology (daily), engineering (weekly).",
         required=False,
-        default=["business", "technology", "news"],
+        default=["business", "technology", "engineering"],
+    )
+    parser.add_argument(
+        "--days",
+        type=int,
+        nargs="+",
+        help="Time window in days for each category (e.g., --days 1 1 7 for business:daily, technology:daily, engineering:weekly). Must match number of categories.",
+        required=False,
     )
     args = parser.parse_args()
+
+    # Validate days argument if provided
+    if args.days:
+        if len(args.days) != len(args.categories):
+            print(f"Error: Number of --days values ({len(args.days)}) must match number of --categories ({len(args.categories)})")
+            return
+        time_windows = dict(zip(args.categories, args.days))
+    else:
+        # Use default time windows
+        time_windows = {cat: DEFAULT_TIME_WINDOWS.get(cat, 1) for cat in args.categories}
 
     # Parse date if provided, otherwise use yesterday
     target_date = None
@@ -74,15 +99,19 @@ def main():
             print("Error: Date must be in YYYY-MM-DD format")
             return
 
-    print(f"Starting daily news summarization for categories: {', '.join(args.categories)}...")
+    # Display configuration
+    config_str = ", ".join([f"{cat} ({time_windows[cat]}d)" for cat in args.categories])
+    print(f"Starting news summarization for: {config_str}...")
 
     try:
         db = SessionLocal()
         
         summaries_created = 0
         for category in args.categories:
-            print(f"\n--- Processing {category.upper()} category ---")
-            summary = process_daily_summary(db, target_date, category=category)
+            days = time_windows[category]
+            window_type = "daily" if days == 1 else f"weekly ({days}d)"
+            print(f"\n--- Processing {category.upper()} category ({window_type}) ---")
+            summary = process_daily_summary(db, target_date, category=category, days=days)
             
             if summary:
                 if save_summary_to_db(db, summary, category):
@@ -91,7 +120,7 @@ def main():
                 print(f"No articles found to summarize for {category} category.")
         
         if summaries_created > 0:
-            print(f"\n✓ Successfully created {summaries_created} summary summaries.")
+            print(f"\n✓ Successfully created {summaries_created} summaries.")
         else:
             print("\nNo summaries were created.")
     finally:

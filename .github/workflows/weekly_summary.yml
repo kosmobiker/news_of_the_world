@@ -1,12 +1,12 @@
-name: Daily Summary
+name: Weekly Summary
 
 on:
   schedule:
-    - cron: "0 6 * * *"  # Daily at 06:00 UTC
+    - cron: "0 6 * * 1"  # Weekly at 06:00 UTC on Monday
   workflow_dispatch:
 
 jobs:
-  summarize-and-send:
+  weekly-summarize-and-send:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,13 +29,13 @@ jobs:
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
-      - name: Run Summarization (previous day)
+      - name: Run Weekly Summarization (previous 7 days)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-        run: uv run summarizers/cli.py --categories business technology --days 1 1
+        run: uv run summarizers/cli.py --categories engineering --days 7
 
-      - name: Send Daily News
+      - name: Send Weekly Engineering News
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TG_API_KEY: ${{ secrets.TG_API_KEY }}
