@@ -118,12 +118,29 @@ def process_daily_summary(
     summarizer = GrokSummarizer(db)
     summary_data = summarizer.summarize_articles(article_dicts)
 
+    # Fallback: if top_articles is empty or has too few entries, use original articles
+    # This ensures users always get links to articles
+    top_articles = summary_data.get("top_articles") or []
+    if len(top_articles) < min(10, len(articles)):
+        # Extract top articles from the original fetched articles (up to 10)
+        fallback_top_articles = [
+            {
+                "title": article.get("headline", "Article"),
+                "source": article.get("website", "Unknown"),
+                "link": article.get("link", ""),
+            }
+            for article in article_dicts[:10]
+        ]
+        summary_data["top_articles"] = fallback_top_articles
+        logger.info(
+            f"Using fallback top articles extraction: {len(fallback_top_articles)} articles with links"
+        )
+
     # Return the summary data instead of saving it to the database
     logger.info(
         f"Generated summary for {start_date.date()} to {target_date.date()}{category_str} with {len(articles)} articles"
     )
-    # Store the date as midnight UTC for the day summarized to keep `daily_summaries.date`
-    # consistent. Use target_date.replace(...) to zero-out time component.
+
     stored_date = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
 
     return {

@@ -82,7 +82,7 @@ def send_telegram_message(bot_token, chat_id, message, max_retries: int = 3):
     for idx, chunk in enumerate(chunks):
         attempt = 0
         while attempt < max_retries:
-            payload = {"chat_id": chat_id, "text": chunk}
+            payload = {"chat_id": chat_id, "text": chunk, "parse_mode": "Markdown"}
             try:
                 resp = requests.post(url, data=payload, timeout=30)
             except requests.RequestException as e:
@@ -164,6 +164,7 @@ def get_daily_summaries(db: Session):
             "key_themes": summary.key_themes,
             "impacted_regions": summary.impacted_regions,
             "detailed_summary": summary.detailed_summary,
+            "top_articles": summary.top_articles,
         }
         for summary in summaries
     ]
@@ -199,6 +200,21 @@ def format_summary(summary):
     # Detailed summary (raw)
     detailed = summary.get("detailed_summary") or ""
     formatted += f"\n📖 Detailed Summary:\n{detailed}\n"
+
+    # Add top articles as clickable hyperlinks
+    top_articles = summary.get("top_articles") or []
+    if top_articles:
+        formatted += "\n🔗 Top Articles:\n"
+        for idx, article in enumerate(top_articles[:10], 1):
+            title = article.get("title", "Article")
+            source = article.get("source", "Unknown")
+            link = article.get("link", "")
+            if link:
+                # Format as Markdown hyperlink: [text](url)
+                formatted += f"  {idx}. [{title} - {source}]({link})\n"
+            else:
+                formatted += f"  {idx}. {title} - {source}\n"
+
     return formatted
 
 

@@ -48,7 +48,7 @@ Rules and constraints (MUST follow exactly):
    - `key_themes`: up to 3 themes. Each key is a short phrase and the value is a short explanation linking evidence from the articles.
    - `impacted_regions`: list countries/regions mentioned, with one-line notes about the nature of impact.
    - `timeline`: chronological map with short date or relative time keys and 1–2 sentence descriptions.
-   - `top_articles`: a list of up to 10 most relevant articles. Each entry is an object with keys "title" (headline), "source" (website), and "link" (URL). Order by relevance to the key events and themes.
+   - `top_articles`: CRITICAL - Extract ALL articles with their exact links. Return up to 10 articles as an array of objects with EXACTLY these keys: "title" (from Title field), "source" (from Source field), "link" (from Link field). MUST preserve exact URLs as provided in input.
 
 Instructions for analysis (stepwise):
 1. Quickly extract the factual claims (who, what, when, where) from each article.
@@ -56,10 +56,12 @@ Instructions for analysis (stepwise):
 3. Detect and collapse near-duplicate events across articles into a single `main_events` entry and note sources in the description.
 4. Identify recurring themes across articles (political, economic, humanitarian, security, engineering, environmental).
 5. Construct a simple chronological `timeline` using explicit dates when present; otherwise use relative markers (e.g., "Day 1", "Earlier this week").
-6. Identify the top 10 most relevant articles by relevance to main events and key themes. Extract their title, source, and link. Preserve the exact links provided in the input.
+6. **IMPORTANT**: Extract the top 10 most relevant articles by relevance to main events and key themes. For EACH article, extract: title (from Title), source (from Source), and exact link (from Link field). Return as array of objects: [{{"title": "...", "source": "...", "link": "..."}}, ...]. DO NOT modify or shorten URLs.
 7. Produce `text_summary` then `detailed_summary` using only the facts and aggregated evidence from the articles.
 
 If a field cannot be populated, return an empty string for text fields, an empty object/dict for mapping fields, or an empty array for `top_articles`.
+
+IMPORTANT REMINDER: The "Title", "Source", and "Link" fields are provided in the article text below. Extract them EXACTLY as they appear.
 
 Articles to analyze (do not modify article text):
 {articles_text}
