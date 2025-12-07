@@ -162,7 +162,6 @@ def get_daily_summaries(db: Session):
             "articles_count": summary.articles_count,
             "main_events": summary.main_events,
             "key_themes": summary.key_themes,
-            "impacted_regions": summary.impacted_regions,
             "detailed_summary": summary.detailed_summary,
             "top_articles": summary.top_articles,
         }
@@ -192,11 +191,6 @@ def format_summary(summary):
     formatted += "\n💡 Key Themes:\n"
     for key, theme in summary["key_themes"].items():
         formatted += f"  - {theme}\n"
-    formatted += "\n🌎 Impacted Regions:\n"
-    impacted = summary.get("impacted_regions") or {}
-    # Ensure we print region name: details
-    for region_name, details in impacted.items():
-        formatted += f"  - {region_name}: {details}\n"
     # Detailed summary (raw)
     detailed = summary.get("detailed_summary") or ""
     formatted += f"\n📖 Detailed Summary:\n{detailed}\n"
