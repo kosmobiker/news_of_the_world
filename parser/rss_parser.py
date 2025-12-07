@@ -30,17 +30,19 @@ def parse_feed(db: Session, feed_config: FeedConfig) -> ParseResult:
     try:
         feed = feedparser.parse(feed_config.url)
 
-        if hasattr(feed, "status") and feed.status != 200:
-            error_msg = f"HTTP error {feed.status} fetching feed"
+        # Check for critical HTTP errors (4xx/5xx excluding 301/302 redirects)
+        status = getattr(feed, "status", 200)
+        if status and status >= 400:
+            error_msg = f"HTTP error {status} fetching feed"
             update_feed_status(
                 db, feed_config.name, feed_config.url, success=False, error=error_msg
             )
             return ParseResult(processed=0, errors=1)
 
-        # The 'bozo' attribute indicates a parsing problem when it is explicitly True.
-        # Use an identity check to avoid truthy MagicMock instances in tests triggering
-        # the error path (MagicMock booleans are truthy but not the boolean True).
-        if getattr(feed, "bozo", False) is True:
+        # Bozo errors are non-fatal if we have entries to parse
+        # (e.g., minor XML issues, incomplete feeds)
+        # Only fail if we have no entries AND a serious bozo exception
+        if getattr(feed, "bozo", False) is True and len(feed.entries) == 0:
             error_msg = (
                 str(getattr(feed, "bozo_exception", "Unknown parsing error"))
                 if getattr(feed, "bozo_exception", None)

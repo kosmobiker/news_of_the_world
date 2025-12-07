@@ -108,13 +108,6 @@ feeds:
       language: "en"
       enabled: true
 
-    - name: "Hacker News"
-      url: "https://hnrss.org/newest.jsonfeed"
-      category: "technology"
-      country: "US"
-      language: "en"
-      enabled: true
-
     - name: "IEEE Spectrum"
       url: "https://feeds.feedburner.com/IeeeSpectrumFullText"
       category: "technology"
@@ -139,13 +132,6 @@ feeds:
 
     - name: "AWS Architecture Blog"
       url: "https://aws.amazon.com/blogs/aws/feed/"
-      category: "engineering"
-      country: "US"
-      language: "en"
-      enabled: true
-
-    - name: "Uber Engineering Blog"
-      url: "https://www.uber.com/blog/engineering/rss/"
       category: "engineering"
       country: "US"
       language: "en"
