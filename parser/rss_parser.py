@@ -3,16 +3,11 @@ import os
 import feedparser
 from datetime import datetime
 from typing import List, Dict, Optional, NamedTuple
-import time
-from urllib.parse import urlparse
 import langdetect
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
 from models.models import Article, FeedStatus, ArticleCreate, FeedConfig
 from parser.config_loader import load_feeds_config, get_enabled_feeds
-import hashlib
-import requests
 from db.database import SessionLocal, get_db
 
 load_dotenv()
@@ -161,126 +156,6 @@ def update_feed_status(
     db.commit()
     db.refresh(status)
     return status
-
-
-def update_feed_status_db(
-    db: Session,
-    feed_config: FeedConfig,
-    parsing_started: bool = False,
-    success: bool = None,
-    articles_count: int = 0,
-    error: str = None,
-):
-    """Update feed status in database."""
-    try:
-        feed_status = db.query(FeedStatus).filter(FeedStatus.feed_name == feed_config.name).first()
-
-        if not feed_status:
-            feed_status = FeedStatus(
-                feed_name=feed_config.name, feed_url=feed_config.url, is_active=feed_config.enabled
-            )
-            db.add(feed_status)
-
-        # Ensure articles_count is a number to allow increments
-        if getattr(feed_status, "articles_count", None) is None:
-            try:
-                feed_status.articles_count = 0
-            except Exception:
-                # If the FeedStatus object doesn't accept assignment here, ignore and rely on DB defaults
-                pass
-
-        now = datetime.now()
-
-        if parsing_started:
-            feed_status.last_parsed_at = now
-        elif success is not None:
-            if success:
-                feed_status.last_success_at = now
-                # Safely increment articles_count even if it was None initially
-                current = feed_status.articles_count or 0
-                feed_status.articles_count = current + articles_count
-            else:
-                feed_status.last_error = error
-
-        db.commit()
-
-    except Exception as e:
-        db.rollback()
-        print(f"Error updating feed status: {e}")
-
-
-# Keep the existing utility functions...
-def extract_website(feed, feed_url: str) -> str:
-    """Extract website domain from feed."""
-    try:
-        if hasattr(feed, "feed") and hasattr(feed.feed, "link"):
-            return urlparse(feed.feed.link).netloc
-        return urlparse(feed_url).netloc
-    except:
-        return urlparse(feed_url).netloc
-
-
-def get_safe_text(entry, field: str) -> str:
-    """Safely extract text from feed entry field."""
-    try:
-        value = getattr(entry, field, "")
-        if isinstance(value, list) and len(value) > 0:
-            return value[0].get("value", "") if isinstance(value[0], dict) else str(value[0])
-        return str(value) if value else ""
-    except (AttributeError, IndexError, TypeError):
-        return ""
-
-
-def parse_published_date(entry) -> Optional[datetime]:
-    """Parse and format the published date."""
-    try:
-        date_fields = ["published_parsed", "updated_parsed", "created_parsed"]
-
-        for field in date_fields:
-            if hasattr(entry, field) and getattr(entry, field):
-                time_struct = getattr(entry, field)
-                return datetime(*time_struct[:6])
-        return None
-    except Exception:
-        return None
-
-
-def extract_content(entry) -> str:
-    """Extract the most comprehensive content available."""
-    try:
-        if hasattr(entry, "content") and entry.content:
-            if isinstance(entry.content, list) and len(entry.content) > 0:
-                return entry.content[0].get("value", "")
-
-        if hasattr(entry, "description") and entry.description:
-            return entry.description
-
-        if hasattr(entry, "summary") and entry.summary:
-            return entry.summary
-
-        return ""
-    except Exception:
-        return ""
-
-
-def detect_language(entry) -> str:
-    """Detect language of the article."""
-    try:
-        text_to_analyze = ""
-
-        if hasattr(entry, "title") and entry.title:
-            text_to_analyze += entry.title + " "
-
-        if hasattr(entry, "summary") and entry.summary:
-            text_to_analyze += entry.summary[:200]
-
-        if text_to_analyze.strip():
-            detected = langdetect.detect(text_to_analyze)
-            return detected
-
-        return "unknown"
-    except Exception:
-        return "unknown"
 
 
 def main():

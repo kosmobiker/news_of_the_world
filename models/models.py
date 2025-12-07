@@ -1,9 +1,9 @@
-from pydantic import BaseModel, HttpUrl, validator
+from pydantic import BaseModel, validator
 from datetime import datetime
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict
 import hashlib
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Date, Boolean, Index
-from sqlalchemy.dialects.postgresql import JSONB, ARRAY
+from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, Index
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
 from sqlalchemy.orm import declarative_base
 
@@ -102,28 +102,12 @@ class ParserSettings(BaseModel):
     user_agent: str = "RSS Parser Bot 1.0"
 
 
-class GrokInteraction(Base):
-    __tablename__ = "grok_interactions"
-
-    id = Column(Integer, primary_key=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    input_prompt = Column(Text, nullable=False)
-    response = Column(JSONB, nullable=True)
-    status = Column(String(50), nullable=False)  # 'success', 'error'
-    error_message = Column(Text, nullable=True)
-
-    def __repr__(self):
-        return (
-            f"<GrokInteraction(id={self.id}, created_at={self.created_at}, status={self.status})>"
-        )
-
-
 class FeedsConfig(BaseModel):
     feeds: Dict[str, List[FeedConfig]]
     settings: ParserSettings
 
 
-class ArticleBase(BaseModel):
+class ArticleCreate(BaseModel):
     website: str
     headline: str
     published_at: Optional[datetime] = None
@@ -134,9 +118,6 @@ class ArticleBase(BaseModel):
     feed_name: Optional[str] = None
     category: Optional[str] = None
     country: Optional[str] = None
-
-
-class ArticleCreate(ArticleBase):
     parsed_at: datetime = datetime.now()
 
     @validator("content", "summary")
@@ -149,12 +130,3 @@ class ArticleCreate(ArticleBase):
         """Generate unique hash for duplicate detection"""
         content = f"{self.website}{self.headline}{self.link}"
         return hashlib.md5(content.encode()).hexdigest()
-
-
-class ArticleResponse(ArticleBase):
-    id: int
-    parsed_at: datetime
-    content_hash: str
-
-    class Config:
-        from_attributes = True

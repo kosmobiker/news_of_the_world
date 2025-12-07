@@ -8,7 +8,6 @@ from xai_sdk import Client
 from xai_sdk.chat import user, system
 from .base import NewsSummarizer
 from sqlalchemy.orm import Session
-from models.models import GrokInteraction
 import logging
 from .prompt_builder import SummarySchema, build_summarization_prompt, get_default_api_params
 
